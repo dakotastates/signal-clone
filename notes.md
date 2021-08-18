@@ -230,4 +230,76 @@
 
 - Create the HomeScreen.js file with simple home text
 - Import and include HomeScreen in app.js (Not going to show)
-- Navigate to registration page and register a user. Should create a user and redirect to home screen. 
+- Navigate to registration page and register a user. Should create a user and redirect to home screen.  
+- Import Safe Area view and scroll view from react-native
+
+    <SafeAreaView>
+      <ScrollView>
+
+      </ScrollView>
+    </SafeAreaView>
+
+- create a components folder and a file called CustomListItem.js
+  - import listitem and avatar
+    - import { ListItem, Avatar } from 'react-native-elements';
+  - return
+
+      <ListItem>
+        <Avatar
+          rounded
+          source={{
+            uri: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+          }}
+        />
+        <ListItem.Content>
+          <ListItem.Title style={{fontWeight: '800'}}>
+            Chat
+          </ListItem.Title>
+          <ListItem.Subtitle numberOfLines={1} ellipsizeMode='tail'>
+            This is a test subtitle
+          </ListItem.Subtitle>
+        </ListItem.Content>
+      </ListItem>
+
+  - NOTE: ellipsizeMode gives a ... if lines are too long
+  - Pass in some props, id, chatName, enterChat
+- Login User
+  - update sign in with
+
+      const signIn = () =>{
+        auth.signInWithEmailAndPassword(email, password).catch(error => alert(error))
+      }
+- Logout user in Home
+  - Add button/Avatar
+  - User LayoutEffect with an Avatar
+
+      useLayoutEffect(()=>{
+        navigation.setOptions({
+          title: 'Signal Clone',
+          headerStyle: { backgroundColor: '#fff'},
+          headerTitleStyle: {color: 'black'},
+          headerTintColor: 'black',
+          headerLeft: () => (
+            <View style={{ marginLeft: 20 }}>
+              <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
+              <Avatar
+                rounded
+                source={{ uri: auth?.currentUser?.photoURL }}
+              />
+              </TouchableOpacity>
+            </View>
+          ),
+        });
+      }, [])
+
+  - NOTE: TouchableOpacity dims the color when clicked or touched.
+
+  - Create signout user function
+
+    const signOutUser = () =>{
+      auth.signOut().then(()=>{
+        navigation.replace('Login')
+      })
+    }
+
+  - 

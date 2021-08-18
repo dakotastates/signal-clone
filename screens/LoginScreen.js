@@ -11,15 +11,16 @@ const LoginScreen = ( { navigation }) => {
 
   useEffect(()=>{
     const unsubscribe = auth.onAuthStateChanged((authUser)=>{
+      console.log(authUser)
       if(authUser){
         navigation.replace('Home')
       }
-      return unsubscribe
     })
+    return unsubscribe
   }, [])
 
   const signIn = () =>{
-
+    auth.signInWithEmailAndPassword(email, password).catch(error => alert(error))
   }
 
   return(
@@ -35,8 +36,17 @@ const LoginScreen = ( { navigation }) => {
         <Input placeholder='Password' secureTextEntry type='password' value={password} onChangeText={text => setPassword(text)} />
       </View>
 
-      <Button containerStyle={styles.button} onPress={signIn} title='Login' />
-      <Button containerStyle={styles.button} onPress={() => navigation.navigate('Register')} type='outline' title='Register' />
+      <Button
+        containerStyle={styles.button}
+        onPress={signIn}
+        title='Login'
+      />
+      <Button
+        containerStyle={styles.button}
+        onPress={() => navigation.navigate('Register')}
+        type='outline' title='Register'
+        onSubmitEditing={signIn}
+      />
       <View style={{height: 100 }} />
     </KeyboardAvoidingView>
 
