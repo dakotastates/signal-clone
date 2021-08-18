@@ -410,4 +410,53 @@
           </ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
-  - 
+  - Make list items clickable
+    - on the list item add an onpress
+      -     <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
+- Create the Chat Screen, ChatScreen.js, import in app.js and create the streen
+- in homescreen create a function called enterchat
+
+    const enterChat = (id, chatName) => {
+      navigation.navigate('Chat', {
+        id,
+        chatName
+      });
+    };
+
+- pass enterChat in as props to CustomListItem
+- useLayoutEffect to create a custom, dynamic header with chat name in header
+
+    useLayoutEffect(()=>{
+        navigation.setOptions({
+          title: 'Chat',
+          headerBackTitleVisable: false,
+          headerTitleAlign: 'left',
+          headerTitle: () => (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}
+            >
+              <Avatar rounded source={{
+                uri: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+              }} />
+              <Text
+                style={{ color:'white', marginLeft: 10, fontWeight: '700'}}
+              >
+                {route.params.chatName}
+              </Text>
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ marginLeft: 10 }}
+              onPress={navigation.goBack}
+            >
+              <AntDesign name='arrowleft' size={24} color='white' />
+            </TouchableOpacity>
+          )
+        });
+    }, [navigation])
+
+  -

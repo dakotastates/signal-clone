@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useState} from 'react';
+import React, {useLayoutEffect, useState, useRef, useEffect} from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput } from 'react-native';
 import { Avatar } from 'react-native-elements'
 import { TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
@@ -16,6 +16,18 @@ const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
 
+  const bottomRef = useRef();
+  const scrollToBottom = () => {
+       bottomRef.current.scrollIntoView({
+       behavior: "smooth",
+       block: "start",
+       });
+   };
+
+   useEffect(() => {
+     scrollToBottom()
+ }, [messages])
+
   useLayoutEffect(()=>{
       navigation.setOptions({
         title: 'Chat',
@@ -29,7 +41,7 @@ const ChatScreen = ({ navigation, route }) => {
             }}
           >
             <Avatar rounded source={{
-              uri: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+              uri: messages[0]?.data.photoURL
             }} />
             <Text
               style={{ color:'white', marginLeft: 10, fontWeight: '700'}}
@@ -65,7 +77,7 @@ const ChatScreen = ({ navigation, route }) => {
           </View>
         )
       });
-  }, [navigation])
+  }, [navigation, messages])
 
   const sendMessage = () =>{
     Keyboard.dismiss();
@@ -88,7 +100,8 @@ const ChatScreen = ({ navigation, route }) => {
       .collection('messages')
       .orderBy('timestamp', 'desc')
       .onSnapshot(snapshot => setMessages(
-      snapshot.docs.map(doc => ({
+
+      snapshot.docs.reverse().map(doc => ({
         id: doc.id,
         data: doc.data()
       }))
@@ -153,6 +166,7 @@ const ChatScreen = ({ navigation, route }) => {
                 </View>
               )
             ))}
+            <View ref={bottomRef}></View>
           </ScrollView>
           <View style={styles.footer}>
             <TextInput
