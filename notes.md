@@ -302,4 +302,112 @@
       })
     }
 
+  - In HomeScreen, header right
+
+        headerRight: () => (
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: 80,
+            marginRight: 20
+          }}>
+            <TouchableOpacity activeOpacity={0.5}>
+              <AntDesign name='camerao' size={24} color='black' />
+            </TouchableOpacity>
+
+            <TouchableOpacity activeOpacity={0.5}>
+              <SimpleLineIcons name='pencil' size={24} color='black' />
+            </TouchableOpacity>
+          </View>
+        )
+    - Put navigation as an argument for the LayoutEffect
+      - }, [navigation])
+    - On pencil icon add
+      - onPress={() => navigation.navigate('AddChat')}
+- create add Chat screen
+  - Update app.js to include AddChatScreen and create a basic AddChatScreen.js file
+  - useLayoutEffect
+
+      useLayoutEffect(()=>{
+        navigation.setOptions({
+          title: 'Add a new Chat',
+          headerBackTitle: 'Chats'
+        })
+      }, [])
+
+  - import useState and create an input
+    -   const [input, setInput] = useState('')
+  - return a view with an input to create the chat
+
+      <View style={styles.container}>
+        <Input
+          placeholder='Enter a Chat Name'
+          value={input}
+          onChangeText={text => setInput(text)}
+          leftIcon={
+            <Icon name='wechat' type='antdesign' size={24} color='black'/>
+          }
+        />
+        <Button onPress={createChat} title='Create new Chat' />
+      </View>
+  - create the createChat function
+    - import the db
+      - import { db } from '../firebase'
+    -  create createChat function
+
+        const createChat = async () =>{
+          await db.collection('chats').add({
+            chatName: input
+          }).then(() => {
+            navigation.goBack()
+          }).catch(error => alert(error))
+        }
+
+  - Go into firebase to create the db
+    - Click on cloud firestore
+    - If you submit from the create chat form the data should show up here.
+- To retrieve all the chats from the database, in HomeScreen create a useEffect and set state for chats
+
+    useEffect(()=>{
+      const unsubscribe = db.collection('chats').onSnapshot(snapshot =>(
+        setChats(snapshot.docs.map(doc => ({
+          id: doc.id,
+          data: doc.data()
+        })))
+      ))
+      return unsubscribe;
+    }, [])
+
+  - usestate
+    - const [chats, setChats] = useState([]);
+
+  - update the return to iterate over the chats in state
+
+      <SafeAreaView>
+        <ScrollView>
+            {chats.map(({id, data: { chatName}}) => (
+              <CustomListItem key={id} id={id} chatName={chatName}/>
+            ))}
+        </ScrollView>
+      </SafeAreaView>
+
+  - Pass data into Custom List Item component
+  - Update the List item component
+
+      <ListItem key={id} bottomDivider>
+        <Avatar
+          rounded
+          source={{
+            uri: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+          }}
+        />
+        <ListItem.Content>
+          <ListItem.Title style={{fontWeight: '800'}}>
+            {chatName}
+          </ListItem.Title>
+          <ListItem.Subtitle numberOfLines={1} ellipsizeMode='tail'>
+            ABC
+          </ListItem.Subtitle>
+        </ListItem.Content>
+      </ListItem>
   - 
