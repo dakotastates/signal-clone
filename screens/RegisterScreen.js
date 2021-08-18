@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button, Input } from 'react-native-elements';
+import React, { useLayoutEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button, Input, Text } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAvoidingView } from 'react-native';
+import { auth } from '../firebase';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -10,8 +11,21 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
+  useLayoutEffect(()=>{
+    navigation.setOptions({
+      headerBackTitle: "Login"
+    })
+  }, [navigation])
+
   const register = () =>{
-    
+    auth.createUserWithEmailAndPassword(email, password)
+    .then(authUser =>{
+      // debugger
+      authUser.user.updateProfile({
+        displayName: name,
+        photoURL: imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+      })
+    }).catch(error => alert(error.message))
   }
 
   return(
@@ -33,7 +47,7 @@ const RegisterScreen = ({ navigation }) => {
 
       </View>
 
-      <Button containerStyle={styles.button} onPress={register} title='Login' />
+      <Button raised containerStyle={styles.button} onPress={register} title='Register' />
       <Button containerStyle={styles.button} onPress={() => navigation.navigate('Login')} type='outline' title='Login' />
       <View style={{height: 100 }} />
     </KeyboardAvoidingView>

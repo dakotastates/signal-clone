@@ -133,7 +133,7 @@
   - import KeyboardAvoidingView
     - import { KeyboardAvoidingView } from 'react-native';
   - replace the first view with KeyboardAvoidingView - This gives padding when keyboard is displayed
-    - <KeyboardAvoidingView behavior='padding' style={styles.container}> 
+    - <KeyboardAvoidingView behavior='padding' style={styles.container}>
   - In stylesheet make some modifications  
 
       const styles = StyleSheet.create({
@@ -144,8 +144,90 @@
           padding: 10,
           backgroundColor: 'white'
         },
-        imputContainer:{},
-        button: {},
+        inputContainer:{
+          width: 300,
+        },
+        button: {
+          width: 200,
+          marginTop: 10,
+        },
       })
 
-  -
+  - Add an empty view to fix a known bug
+    - <View style={{height: 100 }} />
+  - Create the Register screen - RegisterScreen.js
+  - in app.js import register screen
+    - import RegisterScreen from './screens/RegisterScreen'
+  - Add screen to Navigation
+    - <Stack.Screen name='Register' component={RegisterScreen}/>
+  - destructure navigation props
+    - const LoginScreen = ( { navigation }) => {
+  - In login activation register button
+    -       <Button containerStyle={styles.button} onPress={() => navigation.navigate('Register')} type='outline' title='Register' />
+  - Have similar setup for Register but have name, email, password, image url state and fields
+- import useLayoutEffect to change layout effects
+  -  import React, { useLayoutEffect, useState } from 'react';
+
+    useLayoutEffect(()=>{
+      navigation.setOptions({
+        headerBackTitle: "Login"
+      })
+    }, [navigation]);
+
+- Firebase authentication setup
+  - Go to authentication
+  - click Get Started
+  - enable email/password authenicaiton
+  - click on Cloud Firestore to initialize database
+  - Click create database
+  - Start in test mode
+  - click enable
+- Now install firebase from console
+    - expo install firebase
+  - In firebase.js import firebase
+    - import firebase from 'firebase';
+  - manually import firestore and auth
+    - import 'firebase/firestore';
+    - import 'firebase/auth';
+  - Check if firebase app is already intialized
+
+      let app;
+      if (firebase.apps.length === 0){
+        app = firebase.initializeApp(firebaseConfig)
+      } else {
+        app = firebase.app();
+      }
+
+      const db = app.firestore();
+      const auth = firebase.auth();
+
+      export {db, auth };
+- In RegisterScreen import firebase.js
+  - import { auth } from '../firebase';
+- update the register function
+
+  const register = () =>{
+    auth.createUserWithEmailAndPassword(email, password)
+    .then(authUser =>{
+      // debugger
+      authUser.user.updateProfile({
+        displayName: name,
+        photoURL: imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+      })
+    }).catch(error => alert(error.message))
+  }
+
+- In the LoginScreen use a useeffect to check if user exists and redirect if it does.
+
+    useEffect(()=>{
+      const unsubscribe = auth.onAuthStateChanged((authUser)=>{
+        if(authUser){
+          navigation.replace('Home')
+        }
+        return unsubscribe
+      })
+    }, [])
+
+- Create the HomeScreen.js file with simple home text
+- Import and include HomeScreen in app.js (Not going to show)
+- Navigate to registration page and register a user. Should create a user and redirect to home screen. 
